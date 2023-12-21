@@ -1,39 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Calculator.module.scss";
 
 const Calculator = () => {
   const [displayValue, setDisplayValue] = useState("");
+  const [history, setHistory] = useState("");
+  const [result, setResult] = useState("");
 
-  const handleInput = (value: string) => {
-    setDisplayValue(displayValue + value);
-  };
-
-  const calculateResult = () => {
+  const updateResult = () => {
     try {
-      const result = eval(displayValue);
-      setDisplayValue(result.toString());
+      const calculatedResult = eval(history);
+      setResult(calculatedResult.toString());
     } catch (error) {
-      setDisplayValue("Error");
+      setResult(result);
     }
   };
 
+  useEffect(() => {
+    updateResult();
+  }, [history]);
+
+  const handleInput = (value: string) => {
+    setHistory(history + value);
+    setDisplayValue(displayValue + value);
+  };
+
+  const clearLastSign = () => {
+    setHistory(history.slice(0, -1));
+    setDisplayValue(displayValue.slice(0, -1));
+  };
+
   const clearDisplay = () => {
+    setHistory("");
     setDisplayValue("");
+    setResult("");
   };
 
   return (
     <div className={styles.calculator}>
       <div className={styles.display}>
         <div>
-          <h3>{displayValue}</h3>
-          <h2>{displayValue}</h2>
+          <h3>{history}</h3>
+          <h2>{result}</h2>
         </div>
       </div>
       <div className={styles.buttons}>
         <button onClick={() => clearDisplay()}>C</button>
         <button onClick={() => handleInput("/")}>/</button>
-        <button onClick={() => handleInput("X")}>X</button>
-        <button onClick={() => clearDisplay()}>ce</button>
+        <button onClick={() => handleInput("*")}>X</button>
+        <button onClick={() => clearLastSign()}>ce</button>
         <button onClick={() => handleInput("7")}>7</button>
         <button onClick={() => handleInput("8")}>8</button>
         <button onClick={() => handleInput("9")}>9</button>
@@ -45,7 +59,7 @@ const Calculator = () => {
         <button onClick={() => handleInput("1")}>1</button>
         <button onClick={() => handleInput("2")}>2</button>
         <button onClick={() => handleInput("3")}>3</button>
-        <button className={styles.result} onClick={calculateResult}>
+        <button className={styles.result} onClick={updateResult}>
           =
         </button>
         <button onClick={() => handleInput("%")}>%</button>
